@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katla - Wordle Bahasa Indonesia</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <div class="header-content">
+                <button class="icon-btn" id="help-btn" aria-label="Bantuan">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+                    </svg>
+                </button>
+                <h1>KATLA</h1>
+                <button class="icon-btn" id="stats-btn" aria-label="Statistik">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" />
+                    </svg>
+                </button>
+            </div>
+            <div class="divider"></div>
+        </header>
+
+        <main class="game-area">
+            <div id="board-grid" class="board-grid">
+                <div class="board-row" data-row="0"><div class="tile" data-col="0"></div><div class="tile" data-col="1"></div><div class="tile" data-col="2"></div><div class="tile" data-col="3"></div><div class="tile" data-col="4"></div></div>
+                <div class="board-row" data-row="1"><div class="tile" data-col="0"></div><div class="tile" data-col="1"></div><div class="tile" data-col="2"></div><div class="tile" data-col="3"></div><div class="tile" data-col="4"></div></div>
+                <div class="board-row" data-row="2"><div class="tile" data-col="0"></div><div class="tile" data-col="1"></div><div class="tile" data-col="2"></div><div class="tile" data-col="3"></div><div class="tile" data-col="4"></div></div>
+                <div class="board-row" data-row="3"><div class="tile" data-col="0"></div><div class="tile" data-col="1"></div><div class="tile" data-col="2"></div><div class="tile" data-col="3"></div><div class="tile" data-col="4"></div></div>
+                <div class="board-row" data-row="4"><div class="tile" data-col="0"></div><div class="tile" data-col="1"></div><div class="tile" data-col="2"></div><div class="tile" data-col="3"></div><div class="tile" data-col="4"></div></div>
+                <div class="board-row" data-row="5"><div class="tile" data-col="0"></div><div class="tile" data-col="1"></div><div class="tile" data-col="2"></div><div class="tile" data-col="3"></div><div class="tile" data-col="4"></div></div>
+            </div>
+        </main>
+
+        <div class="keyboard-container">
+            <div class="keyboard-row">
+                <button class="key" data-key="Q">Q</button><button class="key" data-key="W">W</button><button class="key" data-key="E">E</button><button class="key" data-key="R">R</button><button class="key" data-key="T">T</button><button class="key" data-key="Y">Y</button><button class="key" data-key="U">U</button><button class="key" data-key="I">I</button><button class="key" data-key="O">O</button><button class="key" data-key="P">P</button>
+            </div>
+            <div class="keyboard-row">
+                <div class="spacer-half"></div>
+                <button class="key" data-key="A">A</button><button class="key" data-key="S">S</button><button class="key" data-key="D">D</button><button class="key" data-key="F">F</button><button class="key" data-key="G">G</button><button class="key" data-key="H">H</button><button class="key" data-key="J">J</button><button class="key" data-key="K">K</button><button class="key" data-key="L">L</button>
+                <div class="spacer-half"></div>
+            </div>
+            <div class="keyboard-row">
+                <button class="key wide-key" data-key="ENTER">ENTER</button>
+                <button class="key" data-key="Z">Z</button><button class="key" data-key="X">X</button><button class="key" data-key="C">C</button><button class="key" data-key="V">V</button><button class="key" data-key="B">B</button><button class="key" data-key="N">N</button><button class="key" data-key="M">M</button>
+                <button class="key wide-key" data-key="BACKSPACE" aria-label="Hapus">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" width="20" height="20">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9.75L14.25 12m0 0l2.25 2.25M14.25 12l2.25-2.25M14.25 12L12 14.25m-2.58 4.92l-6.375-6.375a1.125 1.125 0 010-1.59L9.42 4.83c.211-.211.498-.33.796-.33H19.5a2.25 2.25 0 012.25 2.25v10.5a2.25 2.25 0 01-2.25 2.25h-9.284c-.298 0-.585-.119-.796-.33z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <div id="help-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <button class="close-btn" id="close-help">&times;</button>
+            <h2>Cara Bermain</h2>
+            <p>Tebak kata rahasia <strong>KATLA</strong> dalam 6 kali percobaan.</p>
+            <ul>
+                <li>Setiap tebakan harus berupa kata 5 huruf yang valid dalam KBBI.</li>
+                <li>Warna kotak akan berubah untuk menunjukkan seberapa dekat tebakan Anda dengan kata target.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="game-over-modal" class="modal-overlay hidden">
+        <div class="modal-card game-over-card">
+            <h2 id="game-over-title">Hebat!</h2>
+            <p id="game-over-message">Anda berhasil menebak katanya.</p>
+            <div class="stats-box">
+                <div class="stat-item">
+                    <span class="stat-val" id="stat-attempts">0</span>
+                    <span class="stat-lbl">Percobaan</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-val" id="stat-word">-</span>
+                    <span class="stat-lbl">Kata Rahasia</span>
+                </div>
+            </div>
+            <div id="stats-history-container" class="history-container hidden">
+                <h3>Riwayat Tebakan</h3>
+                <div id="visual-history" class="visual-history"></div>
+            </div>
+            <button class="primary-btn" id="play-again-btn">Main Lagi</button>
+        </div>
+    </div>
+
+    <script src="/static/script.js?v=1.1"></script>
+</body>
+</html>
