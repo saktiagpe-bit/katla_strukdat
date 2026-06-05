@@ -1,9 +1,6 @@
-/**
- * LOGIKA FRONTEND KATLA (WORDLE INDONESIA)
- * Menggunakan Vanilla JavaScript & Integrasi REST API Flask
- */
+const BASE_URL = "http://127.0.0.1:5000";
+
 document.addEventListener("DOMContentLoaded", () => {
-  // state Permainan
   let gameId = null;
   let currentRow = 0;
   let currentCol = 0;
@@ -11,19 +8,19 @@ document.addEventListener("DOMContentLoaded", () => {
   let isGameOver = false;
   let isWaitingForAPI = false;
 
-  // Elements DOM
   const boardGrid = document.getElementById("board-grid");
   const keyboardContainer = document.querySelector(".keyboard-container");
   const toastContainer = document.getElementById("toast-container");
+  
+  const hintContainer = document.getElementById("hint-container");
+  const hintText = document.getElementById("hint-text");
 
-  // Modals & Buttons
   const helpBtn = document.getElementById("help-btn");
   const helpModal = document.getElementById("help-modal");
   const gameOverModal = document.getElementById("game-over-modal");
   const closeHelpBtn = document.getElementById("close-help");
   const playAgainBtn = document.getElementById("play-again-btn");
 
-  // Stats Elements
   const gameOverTitle = document.getElementById("game-over-title");
   const gameOverMessage = document.getElementById("game-over-message");
   const statAttempts = document.getElementById("stat-attempts");
@@ -31,38 +28,30 @@ document.addEventListener("DOMContentLoaded", () => {
   const visualHistory = document.getElementById("visual-history");
   const statsHistoryContainer = document.getElementById("stats-history-container");
 
-  // ==========================================
-  // INISIALISASI & API CALLS
-  // ==========================================
   async function startNewGame() {
     try {
-      // 1. Reset board UI total (Mmnghapus total sisa text dan warna visual)
       const tiles = document.querySelectorAll(".tile");
       tiles.forEach((tile) => {
         tile.textContent = "";
-        tile.className = "tile"; // kembalikan ke class dasar agar warna lama lenyap
-        tile.removeAttribute("style"); // menghapus delay animasi lama
+        tile.className = "tile";
+        tile.removeAttribute("style");
       });
 
-      // 2. reset keyboard ui (mencopot paksa status 'correct', 'present', 'absent')
       const keys = document.querySelectorAll(".key");
       keys.forEach((key) => {
         key.className = key.classList.contains("wide-key") ? "key wide-key" : "key";
       });
 
-      // 3. reset state logika global permainan
       currentRow = 0;
       currentCol = 0;
       currentGuess = [];
       isGameOver = false;
       isWaitingForAPI = false;
 
-      // 4. sembunyikan semua pop-up modal
       gameOverModal.classList.add("hidden");
       helpModal.classList.add("hidden");
 
-      // 5. ambil game_id baru dari flask Backend
-      const response = await fetch("/api/start-game", {
+      const response = await fetch(BASE_URL + "/api/start-game", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -72,12 +61,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (data.success) {
         gameId = data.game_id;
+        
+        if (data.hint) {
+          hintText.textContent = data.hint;
+          hintContainer.classList.remove("hidden");
+        } else {
+          hintContainer.classList.add("hidden");
+        }
+
         showToast("Katla baru dimulai! Tebak kata 5 huruf.", "info");
       } else {
         showToast("Gagal memulai permainan baru. Coba lagi.", "error");
       }
     } catch (error) {
-      console.error("Error starting game:", error);
+      console.error(error);
       showToast("Koneksi ke backend gagal.", "error");
     }
   }
@@ -85,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function submitGuessAPI(guessWord) {
     isWaitingForAPI = true;
     try {
-      const response = await fetch("/api/guess", {
+      const response = await fetch(BASE_URL + "/api/guess", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -103,10 +100,8 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // tebakan valid, lakukan reveal warna per huruf
       revealColors(data.feedback, data.history);
 
-      // beri jeda waktu tunggu sampai animasi flip selesai berputar seluruhnya
       setTimeout(
         () => {
           if (data.is_finished) {
@@ -121,13 +116,12 @@ document.addEventListener("DOMContentLoaded", () => {
         500 + 5 * 100,
       );
     } catch (error) {
-      console.error("Error submitting guess:", error);
+      console.error(error);
       showToast("Gagal memproses tebakan.", "error");
       isWaitingForAPI = false;
     }
   }
 
-  // logika permainan dan input kata
   function handleKeyPress(key) {
     if (isGameOver || isWaitingForAPI || !gameId) return;
     const uppercaseKey = key.toUpperCase();
@@ -233,7 +227,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // akhir game dan tampilkan hasil
   function endGame(isWon, attempts, targetWord, history) {
     isGameOver = true;
 
@@ -263,7 +256,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 1200);
   }
 
-  // notifikasi
   function showToast(message, type = "error") {
     const toast = document.createElement("div");
     toast.className = `toast ${type}`;
@@ -275,9 +267,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 2000);
   }
 
-  // event listener
-
-  // 1. deteksi keyboard fisik pc
   document.addEventListener("keydown", (e) => {
     if (e.altKey || e.ctrlKey || e.metaKey) return;
     let key = e.key;
@@ -285,7 +274,6 @@ document.addEventListener("DOMContentLoaded", () => {
     handleKeyPress(key);
   });
 
-  // 2. deteksi klik keyboard virtual layar
   keyboardContainer.addEventListener("click", (e) => {
     const keyBtn = e.target.closest(".key");
     if (!keyBtn) return;
@@ -293,7 +281,6 @@ document.addEventListener("DOMContentLoaded", () => {
     handleKeyPress(keyValue);
   });
 
-  // 3. tombol buka tutup modal bantuan
   helpBtn.addEventListener("click", () => {
     helpModal.classList.remove("hidden");
   });
@@ -306,11 +293,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // 4. reset ulang ketika tombol main lagi diklik
   playAgainBtn.addEventListener("click", () => {
     startNewGame();
   });
 
-  // jalankan inisialisasi game awal
   startNewGame();
 });

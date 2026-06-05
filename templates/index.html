@@ -7,7 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/style.css">
+    
+    <link rel="stylesheet" href="http://127.0.0.1:5000/static/style.css">
 </head>
 <body>
     <div class="app-container">
@@ -19,14 +20,15 @@
                     </svg>
                 </button>
                 <h1>KATLA</h1>
-                <button class="icon-btn" id="stats-btn" aria-label="Statistik">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" />
-                    </svg>
-                </button>
-            </div>
+                <div style="width: 38px;"></div> </div>
             <div class="divider"></div>
         </header>
+
+        <!-- TAMBAHAN: Container untuk menampilkan hint / petunjuk -->
+        <div id="hint-container" class="hint-container hidden">
+            <span class="hint-label">💡 Petunjuk: </span>
+            <span id="hint-text"></span>
+        </div>
 
         <main class="game-area">
             <div id="board-grid" class="board-grid">
@@ -96,6 +98,6 @@
         </div>
     </div>
 
-    <script src="/static/script.js?v=1.1"></script>
+    <script src="http://127.0.0.1:5000/static/script.js?v=1.1"></script>
 </body>
 </html>
