@@ -1,13 +1,13 @@
 import random
 import uuid
 from flask import Flask, jsonify, render_template, request
-from kbbi import KBBI, TidakDitemukan  # Menggunakan KBBI Lokal Offline
+from kbbi import KBBI, TidakDitemukan  
 
 app = Flask(__name__)
 
-# ==========================================
-# STRUCTURE DATA (Node & Linked List)
-# ==========================================
+
+# structure data (node & linked list)
+
 class Node:
     def __init__(self, data):
         self.data = data
@@ -30,6 +30,7 @@ class LinkedList:
         self.size += 1
 
     def to_list(self):
+        """Mengonversi Linked List menjadi list Python biasa untuk JSON serialization."""
         result = []
         current = self.head
         while current:
@@ -53,9 +54,9 @@ class GameState:
     def get_attempts_count(self):
         return self.guesses.size
 
-# ==========================================
-# OFFLINE KBBI VALIDATION
-# ==========================================
+
+# validasi offline kbbi (proteksi internet)
+
 def cek_kata_di_kbbi(kata):
     """Mengecek kevalidan kata secara offline menggunakan library kbbi."""
     try:
@@ -64,28 +65,36 @@ def cek_kata_di_kbbi(kata):
     except TidakDitemukan:
         return False
     except Exception as e:
-        print(f"Error KBBI: {e}")
+        # jika internet putus atau server kemdikbud down, 
+        # kita loloskan tebakan pemain agar game tetap bisa berjalan offline (anti-crash)
+        print(f"Error KBBI (Menggunakan Mode Fallback Offline): {e}")
         return True 
 
-# Daftar sampel kata target umum
+# daftar sampel kata target umum
 TARGET_WORDS = ["ABADI", "ABSEN", "AGUNG", "AKHIR", "AKRAB", "AKTIF", "ALAMI", "BEBAS", "BENAR", "BESAR", "DUNIA", "MUTU", "PUASA", "SABAR", "SEHAT", "UTAMA", "WARNA", "ZAMAN"]
 
-# ==========================================
-# FEEDBACK LOGIC
-# ==========================================
+
+# feedback logic (anti proteksi)
+
 def calculate_feedback(target_word_arr, guess_str):
     guess_arr = list(guess_str.upper())
     feedback = ["gray"] * 5
+    
+    # proteksi ganda pastikan kedua list memiliki panjang tepat 5 huruf
+    if len(guess_arr) != 5 or len(target_word_arr) != 5:
+        return ["gray", "gray", "gray", "gray", "gray"]
     
     target_counts = {}
     for char in target_word_arr:
         target_counts[char] = target_counts.get(char, 0) + 1
         
+    # tahap 1 tandai 'green' (posisi & huruf benar)
     for i in range(5):
         if guess_arr[i] == target_word_arr[i]:
             feedback[i] = "green"
             target_counts[guess_arr[i]] -= 1
             
+    # tahap 2 tandai 'yellow' (huruf benar, posisi salah)
     for i in range(5):
         if feedback[i] == "green":
             continue
@@ -96,9 +105,9 @@ def calculate_feedback(target_word_arr, guess_str):
             
     return feedback
 
-# ==========================================
-# API ENDPOINTS
-# ==========================================
+
+# api endpoints
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -129,7 +138,7 @@ def submit_guess():
     if len(guess) != 5:
         return jsonify({"success": False, "error": "Tebakan harus terdiri dari 5 huruf."}), 400
         
-    # Validasi kata via library KBBI offline
+    # Validasi kata via library KBBI offline / fallback mode
     if not cek_kata_di_kbbi(guess):
         return jsonify({"success": False, "error": "Kata tidak terdaftar dalam KBBI."}), 400
         

@@ -1,5 +1,5 @@
 :root {
-    /* Color Palette - Premium Slate & Cyberpunk Accent */
+    /* color palette - premium slate & cyberpunk accent */
     --color-bg-start: #0f131a;
     --color-bg-end: #171d2b;
     --color-text-primary: #f8fafc;
@@ -7,18 +7,18 @@
     --color-border: #2e384d;
     --color-border-active: #5f759e;
     
-    /* Wordle State Colors */
-    --color-state-correct: #2ea44f;   /* Emerald Green */
-    --color-state-present: #d29e1a;   /* Warm Amber/Gold */
-    --color-state-absent: #384252;    /* Slate Gray */
+    /* wordle state colors */
+    --color-state-correct: #2ea44f;   /* emerald green */
+    --color-state-present: #d29e1a;   /* warm amber/gold */
+    --color-state-absent: #384252;    /* slate gray */
     --color-state-empty: transparent;
     
-    /* Keyboard Colors */
+    /* keyboards warna */
     --color-key-bg: #202738;
     --color-key-hover: #2b354d;
     --color-key-active: #374463;
     
-    /* Layout Sizes */
+    /* ukuran layout */
     --tile-size: 58px;
     --tile-gap: 8px;
     --keyboard-gap: 6px;
@@ -26,13 +26,13 @@
     --border-radius-md: 12px;
     --max-width-app: 500px;
     
-    /* Fonts */
+    /* fonts */
     --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-/* ==========================================================================
-   BASE & RESET Styles
-   ========================================================================== */
+
+    /* base reset styles */
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -61,9 +61,9 @@ body {
     padding: 12px 8px 16px 8px;
 }
 
-/* ==========================================================================
-   HEADER Styles
-   ========================================================================== */
+
+   /* header styles */
+
 header {
     width: 100%;
 }
@@ -119,9 +119,9 @@ h1 {
     margin-top: 8px;
 }
 
-/* ==========================================================================
-   GAME BOARD Styles
-   ========================================================================== */
+
+   /* game board styles */
+
 .game-area {
     flex-grow: 1;
     display: flex;
@@ -182,9 +182,9 @@ h1 {
     animation: flipAbsent 0.5s ease forwards;
 }
 
-/* ==========================================================================
-   VIRTUAL KEYBOARD Styles
-   ========================================================================== */
+
+   /* virtual keyboard styles */
+
 .keyboard-container {
     width: 100%;
     display: flex;
@@ -259,9 +259,9 @@ h1 {
     background-color: #2f3745;
 }
 
-/* ==========================================================================
-   TOAST / NOTIFICATION Styles
-   ========================================================================== */
+
+   /* toast notifikasi styles */
+
 .toast-container {
     position: fixed;
     top: 10%;
@@ -284,7 +284,7 @@ h1 {
     font-size: 0.95rem;
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 15px rgba(239, 68, 68, 0.15);
     animation: toastSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards,
-               toastFadeOut 0.3s ease forwards 1.7s;
+            toastFadeOut 0.3s ease forwards 1.7s;
     backdrop-filter: blur(8px);
 }
 
@@ -293,9 +293,9 @@ h1 {
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 15px rgba(96, 165, 250, 0.15);
 }
 
-/* ==========================================================================
-   MODAL Styles (Help & GameOver)
-   ========================================================================== */
+
+   /* modal styles help dan game over */
+
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -453,9 +453,9 @@ h3 {
     transform: translateY(0);
 }
 
-/* ==========================================================================
-   ANIMATIONS DEFINITIONS
-   ========================================================================== */
+
+   /* animation definitions */
+
 @keyframes popIn {
     0% {
         transform: scale(0.8);
@@ -571,9 +571,9 @@ h3 {
     }
 }
 
-/* ==========================================================================
-   RESPONSIVE DESIGN (Adaptive Scaling)
-   ========================================================================== */
+
+   /* responsive design (adaptive scaling) */
+
 @media (max-height: 700px) {
     :root {
         --tile-size: 48px;
