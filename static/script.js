@@ -30,11 +30,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function startNewGame() {
     try {
+      // Hilangkan fokus dari tombol aktif (seperti 'Main Lagi') agar tidak tertekan otomatis saat pencet ENTER
+      if (document.activeElement) {
+        document.activeElement.blur();
+      }
+
+      // PERBAIKAN: Reset total seluruh tile beserta state animasinya
       const tiles = document.querySelectorAll(".tile");
       tiles.forEach((tile) => {
         tile.textContent = "";
         tile.className = "tile";
         tile.removeAttribute("style");
+        
+        // Trik forced reflow: memaksa browser menghapus cache animasi game sebelumnya
+        void tile.offsetWidth; 
+      });
+
+      // PERBAIKAN Tambahan: Bersihkan juga efek shake yang tersisa pada baris grid
+      const rows = document.querySelectorAll(".board-row");
+      rows.forEach((row) => {
+        row.className = "board-row";
       });
 
       const keys = document.querySelectorAll(".key");
@@ -159,10 +174,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function shakeActiveRow() {
     const activeRow = boardGrid.querySelector(`.board-row[data-row="${currentRow}"]`);
-    activeRow.classList.add("shake");
-    setTimeout(() => {
-      activeRow.classList.remove("shake");
-    }, 500);
+    if (activeRow) {
+      activeRow.classList.add("shake");
+      setTimeout(() => {
+        activeRow.classList.remove("shake");
+      }, 500);
+    }
   }
 
   function revealColors(feedback, history) {
@@ -171,6 +188,9 @@ document.addEventListener("DOMContentLoaded", () => {
     rowTiles.forEach((tile, index) => {
       const colorState = feedback[index];
       tile.style.animationDelay = `${index * 100}ms`;
+
+      // Clean up typing animations/classes to avoid conflicts with the flip animation
+      tile.classList.remove("active-input", "pop-in");
 
       if (colorState === "green") {
         tile.classList.add("reveal-correct");

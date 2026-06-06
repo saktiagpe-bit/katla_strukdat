@@ -188,6 +188,9 @@ h1 {
     border-color 0.15s ease;
   transform: scale(1);
   background-color: var(--color-state-empty);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
 }
 
 .tile.active-input {
@@ -507,22 +510,22 @@ h3 {
 
 @keyframes flipCorrect {
   0% {
-    transform: rotateX(0deg);
+    transform: scaleY(1);
     background-color: var(--color-state-empty);
     border-color: var(--color-border);
   }
   45% {
-    transform: rotateX(90deg);
+    transform: scaleY(0);
     background-color: var(--color-state-empty);
     border-color: var(--color-border);
   }
   55% {
-    transform: rotateX(90deg);
+    transform: scaleY(0);
     background-color: var(--color-state-correct);
     border-color: var(--color-state-correct);
   }
   100% {
-    transform: rotateX(0deg);
+    transform: scaleY(1);
     background-color: var(--color-state-correct);
     border-color: var(--color-state-correct);
   }
@@ -530,22 +533,22 @@ h3 {
 
 @keyframes flipPresent {
   0% {
-    transform: rotateX(0deg);
+    transform: scaleY(1);
     background-color: var(--color-state-empty);
     border-color: var(--color-border);
   }
   45% {
-    transform: rotateX(90deg);
+    transform: scaleY(0);
     background-color: var(--color-state-empty);
     border-color: var(--color-border);
   }
   55% {
-    transform: rotateX(90deg);
+    transform: scaleY(0);
     background-color: var(--color-state-present);
     border-color: var(--color-state-present);
   }
   100% {
-    transform: rotateX(0deg);
+    transform: scaleY(1);
     background-color: var(--color-state-present);
     border-color: var(--color-state-present);
   }
@@ -553,22 +556,22 @@ h3 {
 
 @keyframes flipAbsent {
   0% {
-    transform: rotateX(0deg);
+    transform: scaleY(1);
     background-color: var(--color-state-empty);
     border-color: var(--color-border);
   }
   45% {
-    transform: rotateX(90deg);
+    transform: scaleY(0);
     background-color: var(--color-state-empty);
     border-color: var(--color-border);
   }
   55% {
-    transform: rotateX(90deg);
+    transform: scaleY(0);
     background-color: var(--color-state-absent);
     border-color: var(--color-state-absent);
   }
   100% {
-    transform: rotateX(0deg);
+    transform: scaleY(1);
     background-color: var(--color-state-absent);
     border-color: var(--color-state-absent);
   }
