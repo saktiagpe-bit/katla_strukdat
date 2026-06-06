@@ -1,9 +1,7 @@
-import urllib.request
-import urllib.error
+import os
 import random
 import uuid
 from flask import Flask, jsonify, render_template, request
-from kbbi import KBBI, TidakDitemukan  
 
 app = Flask(__name__)
 
@@ -14,82 +12,54 @@ def add_cors_headers(response):
     response.headers['Access-Control-Allow-Methods'] = 'POST, GET, OPTIONS'
     return response
 
+# bagian terkecil linked list buat nyimpen data sama pointer ke node selanjutnya
 class Node:
     def __init__(self, data):
-        self.data = data
-        self.next = None
+        self.data = data  # isi tebakan sama feedback warna
+        self.next = None  # lanjutannya ke mana
 
+# linked list buat nyimpen riwayat tebakan biar dinamis
 class LinkedList:
     def __init__(self):
-        self.head = None
-        self.size = 0
+        self.head = None  # mulai dari kosong dulu
+        self.size = 0     # ketahuan udah berapa kali nebak
 
+    # fungsi buat nambahin tebakan baru di baris paling belakang
     def append(self, data):
         new_node = Node(data)
         if not self.head:
-            self.head = new_node
+            self.head = new_node  # kalau masih kosong langsung jadi yang pertama
         else:
+            # jalan dari depan sampai nemu ujungnya
             current = self.head
             while current.next:
                 current = current.next
-            current.next = new_node
+            current.next = new_node  # sambungin node baru di paling ujung
         self.size += 1
 
+    # convert linked list ke list biasa biar bisa dibaca sama json backend
     def to_list(self):
         result = []
         current = self.head
         while current:
-            result.append(current.data)
-            current = current.next
+            result.append(current.data)  # masukin datanya satu-satu
+            current = current.next       # geser ke node depan
         return result
 
 active_games = {}
 
 class GameState:
     def __init__(self, target_word, hint=""):
+        # mecah string kata rahasia jadi array huruf biar gampang dicek per indeks
         self.target_word = list(target_word.upper())
         self.hint = hint
-        self.guesses = LinkedList()
+        self.guesses = LinkedList() # simpan riwayat tebakan pake linked list di atas
         self.max_attempts = 6
         self.is_finished = False
         self.is_won = False
 
     def get_attempts_count(self):
         return self.guesses.size
-
-def validasi_kbbi(kata):
-    kata = kata.lower()
-    vokal = 'aiueo'
-    
-    if not any(v in kata for v in vokal):
-        return False
-        
-    try:
-        KBBI(kata)
-        return True
-    except TidakDitemukan:
-        return False
-    except Exception:
-        pass
-
-    try:
-        url = f"https://kbbi.kemdikbud.go.id/entri/{kata}"
-        req = urllib.request.Request(
-            url, 
-            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-        )
-        response = urllib.request.urlopen(req, timeout=3)
-        html = response.read().decode('utf-8')
-        
-        if "Entri tidak ditemukan" in html or "Pencarian Anda belum ditemukan" in html:
-            return False
-        return True
-    except urllib.error.HTTPError as e:
-        if e.code == 404:
-            return False
-        return False
-    except Exception:
-        return False
 
 TARGET_WORDS = {
     "ABADI": "Tidak ada akhirnya",
@@ -107,6 +77,7 @@ TARGET_WORDS = {
     "DUNIA": "Bumi dan segala isinya",
     "INDAH": "Enak dipandang mata",
     "KAMUS": "Buku referensi arti kata",
+    "NANAS": "Buah bersisik kuning yang menyegarkan",
     "PUASA": "Menahan makan dan minum",
     "SABAR": "Tahan menghadapi cobaan",
     "SEHAT": "Bebas dari penyakit",
@@ -117,6 +88,37 @@ TARGET_WORDS = {
     "MAKAN": "Kalau lapar kita harus apa?"
 }
 
+# pakai hash set biar proses nyari katanya instan dan ga bikin server lemot
+KAMUS_LOKAL_SET = set()
+NAMA_FILE_KAMUS = "kamus.csv"
+
+print(f"Sedang memuat database kamus dari file {NAMA_FILE_KAMUS}...")
+
+if os.path.exists(NAMA_FILE_KAMUS):
+    with open(NAMA_FILE_KAMUS, "r", encoding="utf-8") as file:
+        for baris in file:
+            # bersihin spasi bawaan atau koma formatting csv biar murni teks aja
+            kata_bersih = baris.strip().replace(",", "").lower()
+            if kata_bersih:
+                KAMUS_LOKAL_SET.add(kata_bersih) # masukin ke set ram
+    print(f"Sukses! Memuat {len(KAMUS_LOKAL_SET)} kata ke dalam sistem.")
+else:
+    print(f"Peringatan: File '{NAMA_FILE_KAMUS}' tidak ditemukan! Game hanya mendeteksi TARGET_WORDS.")
+
+def validasi_kamus(kata):
+    kata = kata.lower().strip()
+    
+    # amanin dulu kalau tebakannya ternyata ada di daftar kata rahasia utama
+    if kata.upper() in TARGET_WORDS:
+        return True
+        
+    # langsung cocokin ke set database kamus csv offline yang ada di ram
+    if kata in KAMUS_LOKAL_SET:
+        return True
+        
+    # kalau beneran ga ketemu di mana-mana langsung tolak tebakannya
+    return False
+
 def calculate_feedback(target_word_arr, guess_str):
     guess_arr = list(guess_str.upper())
     feedback = ["gray"] * 5
@@ -124,19 +126,23 @@ def calculate_feedback(target_word_arr, guess_str):
     if len(guess_arr) != 5 or len(target_word_arr) != 5:
         return ["gray", "gray", "gray", "gray", "gray"]
     
+    # pake dictionary hash map buat ngitung jumlah huruf biar ga ngebug kalau ada huruf kembar
     target_counts = {}
     for char in target_word_arr:
         target_counts[char] = target_counts.get(char, 0) + 1
         
+    # step 1: cek dulu huruf yang posisinya udah pas banget (kasih warna ijo)
     for i in range(5):
         if guess_arr[i] == target_word_arr[i]:
             feedback[i] = "green"
-            target_counts[guess_arr[i]] -= 1
+            target_counts[guess_arr[i]] -= 1  # jatah huruf ijo dikurangin
             
+    # step 2: baru cek huruf yang ada di kata target tapi salah posisi (kasih warna kuning)
     for i in range(5):
         if feedback[i] == "green":
             continue
         char = guess_arr[i]
+        # sisa jatah hurufnya dicek lewat dictionary target_counts
         if char in target_counts and target_counts[char] > 0:
             feedback[i] = "yellow"
             target_counts[char] -= 1
@@ -183,8 +189,8 @@ def submit_guess():
     if len(guess) != 5:
         return jsonify({"success": False, "error": "Tebakan harus terdiri dari 5 huruf."}), 400
         
-    if guess not in TARGET_WORDS and not validasi_kbbi(guess):
-        return jsonify({"success": False, "error": "Kata tidak terdaftar dalam KBBI."}), 400
+    if guess not in TARGET_WORDS and not validasi_kamus(guess):
+        return jsonify({"success": False, "error": "Kata tidak terdaftar dalam Kamus."}), 400
         
     feedback = calculate_feedback(game_state.target_word, guess)
     
@@ -192,6 +198,8 @@ def submit_guess():
         "guess": guess,
         "feedback": feedback
     }
+    
+    # simpan record hasil tebakan barusan ke dalam struktur data linked list
     game_state.guesses.append(guess_record)
     
     is_won = all(color == "green" for color in feedback)
@@ -211,6 +219,7 @@ def submit_guess():
         "attempts": attempts_count,
         "is_finished": game_state.is_finished,
         "is_won": game_state.is_won,
+        # lempar riwayat data linked list yang udah di-convert ke list biasa
         "history": game_state.guesses.to_list()
     }
     
